@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.dist/
+.venv/
+venv/
+
+# Jupyter/Colab
+.ipynb_checkpoints/
+*.ipynb~~
+
+# OS
+.DS_Store
+
+# Data (keep raw CSV that is provided by instructor if required)
+data/processed/
