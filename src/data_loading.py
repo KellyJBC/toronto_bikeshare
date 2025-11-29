@@ -102,4 +102,3 @@ def load_station_coordinates(csv_path: Optional[str] = None) -> Optional[pd.Data
         raise ValueError(f"Station coordinates CSV missing columns: {missing}")
 
     return df
-
