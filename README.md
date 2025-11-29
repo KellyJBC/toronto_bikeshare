@@ -8,12 +8,12 @@ Team Members:
   Eduardo Leiva**
 
 This project delivers an end-to-end analytics solution for the Toronto Bike-Sharing dataset, including:  
-✔ Data loading & cleaning  
-✔ Exploratory analytics  
-✔ Testing using TDD  
-✔ Streamlit dashboard  
-✔ Deployment-ready folder structure  
-✔ Work completed in two Agile sprints  
+• Data loading & cleaning  
+• Exploratory analytics  
+• Testing using TDD  
+• Streamlit dashboard  
+• Deployment-ready folder structure  
+• Work completed in two Agile sprints  
 
 ---
 
