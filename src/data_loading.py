@@ -1,11 +1,3 @@
-"""
-data_loading.py
-
-User Stories:
-- US-01: Load raw Toronto bike data (TDD)
-- US-10: Load optional station coordinates for map visualization
-"""
-
 from pathlib import Path
 from typing import Optional
 
@@ -64,41 +56,5 @@ def load_raw_data(csv_path: Optional[str] = None) -> pd.DataFrame:
     missing = [col for col in EXPECTED_TRIP_COLUMNS if col not in df.columns]
     if missing:
         raise ValueError(f"Trip CSV missing expected columns: {missing}")
-
-    return df
-
-
-def load_station_coordinates(csv_path: Optional[str] = None) -> Optional[pd.DataFrame]:
-    """
-    Load optional station coordinates CSV for map visualization.
-
-    Expected columns:
-    - station_id
-    - station_name
-    - lat
-    - lon
-
-    If the file does not exist, returns None (map plot will be skipped).
-
-    Parameters
-    ----------
-    csv_path : str or None
-        Optional path to the CSV. If None, uses DEFAULT_STATION_COORDS_CSV.
-
-    Returns
-    -------
-    df_coords : pandas.DataFrame or None
-    """
-    path = Path(csv_path) if csv_path is not None else DEFAULT_STATION_COORDS_CSV
-    if not path.exists():
-        # This is not considered an error; map is optional.
-        return None
-
-    df = pd.read_csv(path)
-
-    required_cols = {"station_id", "station_name", "lat", "lon"}
-    missing = required_cols.difference(df.columns)
-    if missing:
-        raise ValueError(f"Station coordinates CSV missing columns: {missing}")
 
     return df
