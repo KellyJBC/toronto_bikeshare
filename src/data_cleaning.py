@@ -52,3 +52,55 @@ def clean_basic(df: pd.DataFrame) -> pd.DataFrame:
     df = df.reset_index(drop=True)
     return df
 
+def parse_and_enrich_datetime(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Parse Start Time and End Time as datetime and derive useful features:
+    - trip_date
+    - start_hour
+    - start_weekday
+    - start_month
+    - trip_duration_min (from seconds)
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Cleaned DataFrame.
+
+    Returns
+    -------
+    df_features : pandas.DataFrame
+    """
+    df = df.copy()
+
+    # Parse datetimes (format: MM/DD/YYYY HH:MM)
+    df[START_TIME_COL] = pd.to_datetime(df[START_TIME_COL], format="%m/%d/%Y %H:%M")
+    df[END_TIME_COL] = pd.to_datetime(df[END_TIME_COL], format="%m/%d/%Y %H:%M")
+
+    # Derive features
+    df[TRIP_DATE_COL] = df[START_TIME_COL].dt.date
+    df[START_HOUR_COL] = df[START_TIME_COL].dt.hour
+    df[START_WEEKDAY_COL] = df[START_TIME_COL].dt.day_name()
+    df[START_MONTH_COL] = df[START_TIME_COL].dt.strftime("%B")
+
+    # Duration in minutes
+    if TRIP_DURATION_COL in df.columns:
+        df[TRIP_DURATION_MIN_COL] = df[TRIP_DURATION_COL] / 60.0
+    else:
+        df[TRIP_DURATION_MIN_COL] = np.nan
+
+    return df
+
+
+def full_clean_pipeline(df_raw: pd.DataFrame) -> pd.DataFrame:
+    """
+    Convenience function used in notebooks and dashboard.
+
+    Steps:
+    - clean_basic()
+    - parse_and_enrich_datetime()
+
+    Returns a fully cleaned and feature-enriched DataFrame.
+    """
+    df = clean_basic(df_raw)
+    df = parse_and_enrich_datetime(df)
+    return df
