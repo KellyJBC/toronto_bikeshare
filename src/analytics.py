@@ -33,3 +33,45 @@ def hourly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
         .sort_values(START_HOUR_COL)
     )
     return grouped
+
+def daily_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Group by trip_date and count trips.
+
+    Returns columns:
+    - trip_date
+    - trip_count
+    """
+    if TRIP_DATE_COL not in df.columns:
+        raise ValueError(f"{TRIP_DATE_COL} not found. Did you run parse_and_enrich_datetime()?")
+
+    grouped = (
+        df.groupby(TRIP_DATE_COL)
+        .size()
+        .reset_index(name="trip_count")
+        .sort_values(TRIP_DATE_COL)
+    )
+    return grouped
+
+
+def weekly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Group trips by ISO week number of Start Time.
+
+    Returns columns:
+    - week_label 
+    - trip_count
+    """
+    if START_TIME_COL not in df.columns:
+        raise ValueError(f"{START_TIME_COL} not found.")
+
+    temp = df.copy()
+    temp["week_label"] = temp[START_TIME_COL].dt.strftime("%G-W%V")
+
+    grouped = (
+        temp.groupby("week_label")
+        .size()
+        .reset_index(name="trip_count")
+        .sort_values("week_label")
+    )
+    return grouped
