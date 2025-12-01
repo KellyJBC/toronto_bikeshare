@@ -7,8 +7,9 @@ from .data_cleaning import (
     START_HOUR_COL,
     START_WEEKDAY_COL,
     START_MONTH_COL,
-    TRIP_DURATION_MIN_COL,
+    TRIP_DURATION_MIN_COL
 )
+
 from .data_loading import (
     START_TIME_COL,  # if needed
 )
