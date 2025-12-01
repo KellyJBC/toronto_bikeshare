@@ -9,10 +9,6 @@ from .data_cleaning import (
     START_WEEKDAY_COL,
     START_MONTH_COL,
     TRIP_DURATION_MIN_COL,
-)
-from .data_loading import (
-    START_TIME_COL,  # if needed
-)
 
 
 def hourly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
@@ -56,17 +52,13 @@ def daily_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
 
 def weekly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Group trips by ISO week number of Start Time.
-
-    Returns columns:
-    - week_label 
-    - trip_count
+    Group trips by ISO week number using TRIP_DATE_COL.
     """
-    if START_TIME_COL not in df.columns:
-        raise ValueError(f"{START_TIME_COL} not found.")
+    if TRIP_DATE_COL not in df.columns:
+        raise ValueError(f"{TRIP_DATE_COL} not found. Did you run parse_and_enrich_datetime()?")
 
     temp = df.copy()
-    temp["week_label"] = temp[START_TIME_COL].dt.strftime("%G-W%V")
+    temp["week_label"] = temp[TRIP_DATE_COL].dt.strftime("%G-W%V")
 
     grouped = (
         temp.groupby("week_label")
