@@ -12,11 +12,6 @@ from .data_cleaning import (
     full_clean_pipeline,
 )
 
-from .data_loading import (
-    START_TIME_COL,  # if needed
-)
-
-
 def hourly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
     """
     Group by start_hour and count trips.
