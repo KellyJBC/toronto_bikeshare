@@ -25,3 +25,15 @@ def plot_hourly_usage(df: pd.DataFrame):
     ax.set_xticks(range(0, 24))
     fig.tight_layout()
     return fig
+
+
+def plot_daily_trends(df: pd.DataFrame):
+    daily_df = daily_trip_counts(df)
+    fig, ax = plt.subplots(figsize=(8, 4))
+    ax.plot(daily_df["trip_date"], daily_df["trip_count"], marker="o")
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Number of Trips")
+    ax.set_title("Daily Ridership")
+    fig.autofmt_xdate()
+    fig.tight_layout()
+    return fig
