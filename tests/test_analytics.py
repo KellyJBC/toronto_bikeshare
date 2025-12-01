@@ -46,3 +46,18 @@ def test_hourly_trip_counts():
     hourly = hourly_trip_counts(df)
     assert hourly["trip_count"].sum() == len(df)
     assert set(hourly["start_hour"]) == {8, 9}
+
+
+def test_daily_trip_counts():
+    df = sample_enriched_df()
+    daily = daily_trip_counts(df)
+    assert daily["trip_count"].sum() == len(df)
+    assert len(daily) == 2  # two distinct dates
+
+
+def test_weekly_trip_counts():
+    df = sample_enriched_df()
+    weekly = weekly_trip_counts(df)
+    assert weekly["trip_count"].sum() == len(df)
+    assert len(weekly) == 1  # all within same week
+

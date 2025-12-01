@@ -1,8 +1,9 @@
+
 from typing import Dict, Literal
 
 import pandas as pd
 
-from .data_cleaning import (
+from data_cleaning import (
     TRIP_DATE_COL,
     START_HOUR_COL,
     START_WEEKDAY_COL,
@@ -31,5 +32,43 @@ def hourly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
         .size()
         .reset_index(name="trip_count")
         .sort_values(START_HOUR_COL)
+    )
+    return grouped
+
+def daily_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Group by trip_date and count trips.
+
+    Returns columns:
+    - trip_date
+    - trip_count
+    """
+    if TRIP_DATE_COL not in df.columns:
+        raise ValueError(f"{TRIP_DATE_COL} not found. Did you run parse_and_enrich_datetime()?")
+
+    grouped = (
+        df.groupby(TRIP_DATE_COL)
+        .size()
+        .reset_index(name="trip_count")
+        .sort_values(TRIP_DATE_COL)
+    )
+    return grouped
+
+
+def weekly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Group trips by ISO week number using TRIP_DATE_COL.
+    """
+    if TRIP_DATE_COL not in df.columns:
+        raise ValueError(f"{TRIP_DATE_COL} not found. Did you run parse_and_enrich_datetime()?")
+
+    temp = df.copy()
+    temp["week_label"] = temp[TRIP_DATE_COL].dt.strftime("%G-W%V")
+
+    grouped = (
+        temp.groupby("week_label")
+        .size()
+        .reset_index(name="trip_count")
+        .sort_values("week_label")
     )
     return grouped
