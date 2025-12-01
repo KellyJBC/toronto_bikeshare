@@ -1,9 +1,2 @@
-"""
-Toronto Bike-Sharing Analytics Tool
+# Make src a package
 
-This package contains modules for:
-- Loading and cleaning data
-- Computing analytics summaries
-- Generating plots
-- Running a Streamlit dashboard
-"""
