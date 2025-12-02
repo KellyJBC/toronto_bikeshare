@@ -1,39 +1,56 @@
-from typing import Optional
+from typing import Dict, Literal
 
-import matplotlib.pyplot as plt
 import pandas as pd
-import plotly.express as px
 
-from .analytics import (
-    hourly_trip_counts,
-    daily_trip_counts,
-    weekly_trip_counts,
-    popular_stations,
-    user_type_summary,
-    monthly_trip_counts,
+from .data_cleaning import (
+    TRIP_DATE_COL,
+    START_HOUR_COL,
+    TRIP_DURATION_MIN_COL,
 )
-from .data_loading import load_station_coordinates
+
+# We use the raw column name here so we don't depend on other modules for this constant
+START_TIME_COL = "Start Time"
 
 
-def plot_hourly_usage(df: pd.DataFrame):
-    hourly_df = hourly_trip_counts(df)
-    fig, ax = plt.subplots(figsize=(8, 4))
-    ax.bar(hourly_df["start_hour"], hourly_df["trip_count"])
-    ax.set_xlabel("Hour of Day")
-    ax.set_ylabel("Number of Trips")
-    ax.set_title("Trips per Hour")
-    ax.set_xticks(range(0, 24))
-    fig.tight_layout()
-    return fig
+def hourly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Group by start_hour and count trips.
+
+    Returns a DataFrame with columns:
+    - start_hour (int)
+    - trip_count (int)
+    """
+    if START_HOUR_COL not in df.columns:
+        raise ValueError(
+            f"{START_HOUR_COL} not found. Did you run parse_and_enrich_datetime()?"
+        )
+
+    grouped = (
+        df.groupby(START_HOUR_COL)
+        .size()
+        .reset_index(name="trip_count")
+        .sort_values(START_HOUR_COL)
+    )
+    return grouped
 
 
-def plot_daily_trends(df: pd.DataFrame):
-    daily_df = daily_trip_counts(df)
-    fig, ax = plt.subplots(figsize=(8, 4))
-    ax.plot(daily_df["trip_date"], daily_df["trip_count"], marker="o")
-    ax.set_xlabel("Date")
-    ax.set_ylabel("Number of Trips")
-    ax.set_title("Daily Ridership")
-    fig.autofmt_xdate()
-    fig.tight_layout()
-    return fig
+def daily_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Group by trip_date and count trips.
+
+    Returns columns:
+    - trip_date
+    - trip_count
+    """
+    if TRIP_DATE_COL not in df.columns:
+        raise ValueError(
+            f"{TRIP_DATE_COL} not found. Did you run parse_and_enrich_datetime()?"
+        )
+
+    grouped = (
+        df.groupby(TRIP_DATE_COL)
+        .size()
+        .reset_index(name="trip_count")
+        .sort_values(TRIP_DATE_COL)
+    )
+    return grouped

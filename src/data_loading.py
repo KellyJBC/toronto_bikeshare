@@ -3,6 +3,12 @@ from typing import Optional
 
 import pandas as pd
 
+# Column name constants
+TRIP_ID_COL = "Trip Id"
+START_TIME_COL = "Start Time"
+END_TIME_COL = "End Time"
+USER_TYPE_COL = "User Type"
+
 # Constants for default paths
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = PROJECT_ROOT / "data"
