@@ -2,7 +2,7 @@ from typing import Dict, Literal
 
 import pandas as pd
 
-from data_cleaning import (
+from .data_cleaning import (
     TRIP_DATE_COL,
     START_HOUR_COL,
     TRIP_DURATION_MIN_COL,
