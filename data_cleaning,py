@@ -1,1 +1,104 @@
+# Define the content for src/data_cleaning.py (code_for_data_cleaning_py)
 
+import pandas as pd
+import os
+
+def parse_and_enrich_datetime(df: pd.DataFrame, datetime_col: str, drop_original: bool = True) -> pd.DataFrame:
+
+Parses a datetime column and extracts various time-based features.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+        datetime_col (str): The name of the column to parse as datetime.
+        drop_original (bool): Whether to drop the original datetime column after enrichment.
+
+    Returns:
+        pd.DataFrame: The DataFrame with parsed datetime and enriched features.
+    """
+    df_copy = df.copy() # Work on a copy to avoid modifying original DataFrame directly
+
+    if datetime_col not in df_copy.columns:
+        print(f"Warning: Column '{datetime_col}' not found in DataFrame. Returning original DataFrame.")
+        return df_copy
+
+    # Convert to datetime, coercing errors
+    df_copy[datetime_col] = pd.to_datetime(df_copy[datetime_col], errors='coerce')
+
+    # Drop rows where datetime parsing failed
+    df_copy.dropna(subset=[datetime_col], inplace=True)
+
+if not df_copy.empty:
+        # Extract features
+        df_copy[f"{datetime_col}_year"] = df_copy[datetime_col].dt.year
+        df_copy[f"{datetime_col}_month"] = df_copy[datetime_col].dt.month
+        df_copy[f"{datetime_col}_day"] = df_copy[datetime_col].dt.day
+        df_copy[f"{datetime_col}_hour"] = df_copy[datetime_col].dt.hour
+        df_copy[f"{datetime_col}_minute"] = df_copy[datetime_col].dt.minute
+        df_copy[f"{datetime_col}_dayofweek"] = df_copy[datetime_col].dt.dayofweek # Monday=0, Sunday=6
+        df_copy[f"{datetime_col}_day_name"] = df_copy[datetime_col].dt.day_name()
+        df_copy[f"{datetime_col}_is_weekend"] = df_copy[datetime_col].dt.dayofweek.isin([5, 6]) # Saturday=5, Sunday=6
+        df_copy[f"{datetime_col}_quarter"] = df_copy[datetime_col].dt.quarter
+        df_copy[f"{datetime_col}_weekofyear"] = df_copy[datetime_col].dt.isocalendar().week.astype(int)
+        df_copy[f"{datetime_col}_dayofyear"] = df_copy[datetime_col].dt.dayofyear
+
+
+    if drop_original:
+        df_copy = df_copy.drop(columns=[datetime_col])
+
+    return df_copy
+
+# Create or overwrite src/data_cleaning.py
+file_path = '/content/toronto_bikeshare/src/data_cleaning.py'
+
+# Ensure the directory exists
+os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+with open(file_path, 'w') as f:
+    f.write(code_for_data_cleaning_py)
+
+print("Updated src/data_cleaning.py with parse_and_enrich_datetime function.")
+
+#Updated src/data_cleaning.py with parse_and_enrich_datetime function.
+
+import pandas as pd
+from toronto_bikeshare.src import data_loading, data_cleaning
+import os
+
+# Define the path to the data file
+data_file_path = '/content/toronto_bikeshare/data/financial_transactions_toronto_bike.csv'
+
+# Ensure the data file exists
+if not os.path.exists(data_file_path):
+    print(f"Error: Data file not found at {data_file_path}")
+else:
+    # Load the data using data_loading (assuming it has a load_data function)
+    try:
+        df = data_loading.load_data(data_file_path)
+        print("Data loaded successfully using data_loading.load_data.")
+    except AttributeError:
+        print("data_loading module does not have a 'load_data' function. Loading directly with pandas.")
+        df = pd.read_csv(data_file_path)
+    except Exception as e:
+        print(f"An error occurred while loading data: {e}")
+        df = pd.DataFrame() # Create an empty DataFrame to prevent further errors
+
+    # Use the correct column name 'Start Time'
+    datetime_column_name = 'Start Time'
+
+    if not df.empty and datetime_column_name in df.columns:
+        # Apply the new function
+        df_enriched = data_cleaning.parse_and_enrich_datetime(df, datetime_column_name)
+        print("\nDataFrame after datetime enrichment (first 5 rows):")
+        display(df_enriched.head())
+        print("\nNew columns added by datetime enrichment:")
+        # Adjust the prefix for checking new columns if original was dropped
+        display(df_enriched.columns[df_enriched.columns.str.startswith(f'{datetime_column_name}_')])
+    elif not df.empty:
+        print(f"Column '{datetime_column_name}' not found in the loaded DataFrame. Cannot apply datetime enrichment.")
+        print("Available columns:")
+        display(df.columns)
+        display(df.head()) # Show df head to let user know available columns.
+    else:
+        print("DataFrame is empty after loading. Cannot proceed with enrichment.")
+
+display(df.head()) # Show df head to let user know available columns
