@@ -1,5 +1,8 @@
 import pytest
+import sys
+import os
 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.data_loading import load_raw_data, EXPECTED_TRIP_COLUMNS
 
 
