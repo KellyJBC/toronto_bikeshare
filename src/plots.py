@@ -4,6 +4,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.express as px
 
+from .data_cleaning import (
+    TRIP_DATE_COL,
+    START_HOUR_COL,
+    TRIP_DURATION_MIN_COL,
+)
+
 from .analytics import (
     hourly_trip_counts,
     daily_trip_counts,
@@ -12,8 +18,8 @@ from .analytics import (
     user_type_summary,
     monthly_trip_counts,
 )
-from .data_loading import load_station_coordinates
 
+from .data_loading import load_station_coordinates
 
 def plot_hourly_usage(df: pd.DataFrame):
     hourly_df = hourly_trip_counts(df)
