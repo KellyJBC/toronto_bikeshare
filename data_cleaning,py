@@ -58,47 +58,4 @@ with open(file_path, 'w') as f:
 
 print("Updated src/data_cleaning.py with parse_and_enrich_datetime function.")
 
-#Updated src/data_cleaning.py with parse_and_enrich_datetime function.
-
-import pandas as pd
-from toronto_bikeshare.src import data_loading, data_cleaning
-import os
-
-# Define the path to the data file
-data_file_path = '/content/toronto_bikeshare/data/financial_transactions_toronto_bike.csv'
-
-# Ensure the data file exists
-if not os.path.exists(data_file_path):
-    print(f"Error: Data file not found at {data_file_path}")
-else:
-    # Load the data using data_loading (assuming it has a load_data function)
-    try:
-        df = data_loading.load_data(data_file_path)
-        print("Data loaded successfully using data_loading.load_data.")
-    except AttributeError:
-        print("data_loading module does not have a 'load_data' function. Loading directly with pandas.")
-        df = pd.read_csv(data_file_path)
-    except Exception as e:
-        print(f"An error occurred while loading data: {e}")
-        df = pd.DataFrame() # Create an empty DataFrame to prevent further errors
-
-    # Use the correct column name 'Start Time'
-    datetime_column_name = 'Start Time'
-
-    if not df.empty and datetime_column_name in df.columns:
-        # Apply the new function
-        df_enriched = data_cleaning.parse_and_enrich_datetime(df, datetime_column_name)
-        print("\nDataFrame after datetime enrichment (first 5 rows):")
-        display(df_enriched.head())
-        print("\nNew columns added by datetime enrichment:")
-        # Adjust the prefix for checking new columns if original was dropped
-        display(df_enriched.columns[df_enriched.columns.str.startswith(f'{datetime_column_name}_')])
-    elif not df.empty:
-        print(f"Column '{datetime_column_name}' not found in the loaded DataFrame. Cannot apply datetime enrichment.")
-        print("Available columns:")
-        display(df.columns)
-        display(df.head()) # Show df head to let user know available columns.
-    else:
-        print("DataFrame is empty after loading. Cannot proceed with enrichment.")
-
-display(df.head()) # Show df head to let user know available columns
+#Updated src/data_cleaning.py with parse_and_enrich_datetime function
