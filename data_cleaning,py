@@ -1,23 +1,22 @@
-#1. src/data_cleaning.py file content
-#This is the Python code that defines the parse_and_enrich_datetime function, which was saved to the src/data_cleaning.py file.
+#1. src/data_cleaning.py file content. This is the Python code that defines the parse_and_enrich_datetime function, which was saved to the src/data_cleaning.py file.
 
 import pandas as pd
 
 def parse_and_enrich_datetime(df: pd.DataFrame, datetime_col: str, drop_original: bool = True) -> pd.DataFrame:
-    """
-    Parses a datetime column and extracts various time-based features.
 
-    Args:
-        df (pd.DataFrame): The input DataFrame.
-        datetime_col (str): The name of the column to parse as datetime.
-        drop_original (bool): Whether to drop the original datetime column after enrichment.
+#Parses a datetime column and extracts various time-based features.
 
-    Returns:
-        pd.DataFrame: The DataFrame with parsed datetime and enriched features.
-    """
-    df_copy = df.copy() # Work on a copy to avoid modifying original DataFrame directly
+#Args:
+        #df (pd.DataFrame): The input DataFrame.
+        #datetime_col (str): The name of the column to parse as datetime.
+       # drop_original (bool): Whether to drop the original datetime column after enrichment.
 
-    if datetime_col not in df_copy.columns:
+#Returns:
+        #pd.DataFrame: The DataFrame with parsed datetime and enriched features.
+   
+    #df_copy = df.copy() # Work on a copy to avoid modifying original DataFrame directly
+
+    #if datetime_col not in df_copy.columns:
         print(f"Warning: Column '{datetime_col}' not found in DataFrame. Returning original DataFrame.")
         return df_copy
 
@@ -27,7 +26,7 @@ def parse_and_enrich_datetime(df: pd.DataFrame, datetime_col: str, drop_original
     # Drop rows where datetime parsing failed
     df_copy.dropna(subset=[datetime_col], inplace=True)
 
-    if not df_copy.empty:
+    #if not df_copy.empty:
         # Extract features
         df_copy[f"{datetime_col}_year"] = df_copy[datetime_col].dt.year
         df_copy[f"{datetime_col}_month"] = df_copy[datetime_col].dt.month
@@ -42,7 +41,7 @@ def parse_and_enrich_datetime(df: pd.DataFrame, datetime_col: str, drop_original
         df_copy[f"{datetime_col}_dayofyear"] = df_copy[datetime_col].dt.dayofyear
 
 
-    if drop_original:
+    #if drop_original:
         df_copy = df_copy.drop(columns=[datetime_col])
 
     return df_copy
