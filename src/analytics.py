@@ -68,3 +68,26 @@ def weekly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
         .sort_values("week_label")
     )
     return grouped
+
+def user_type_summary(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Summarize trips by user type.
+
+    Returns columns:
+    - User Type
+    - trip_count
+    - avg_duration_min
+    """
+    if TRIP_DURATION_MIN_COL not in df.columns:
+        raise ValueError(f"{TRIP_DURATION_MIN_COL} not found. Did you run parse_and_enrich_datetime()?")
+
+    grouped = (
+        df.groupby("User Type")
+        .agg(
+            trip_count=("Trip Id", "count"),
+            avg_duration_min=(TRIP_DURATION_MIN_COL, "mean"),
+        )
+        .reset_index()
+        .sort_values("trip_count", ascending=False)
+    )
+    return grouped
