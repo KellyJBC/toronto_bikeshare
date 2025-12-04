@@ -96,6 +96,39 @@ def weekly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
     )
     return grouped
 
+def popular_stations(
+    df: pd.DataFrame,
+    top_n: int = 10,
+    by: Literal["start", "end"] = "start",
+) -> pd.DataFrame:
+    """
+    Compute top N popular stations.
+
+    Parameters
+    ----------
+    by : "start" or "end"
+        Whether to use Start Station Name or End Station Name.
+
+    Returns columns:
+    - station_name
+    - trip_count
+    """
+    if by == "start":
+        col = "Start Station Name"
+    elif by == "end":
+        col = "End Station Name"
+    else:
+        raise ValueError("Parameter 'by' must be 'start' or 'end'.")
+
+    grouped = (
+        df.groupby(col)
+        .size()
+        .reset_index(name="trip_count")
+        .sort_values("trip_count", ascending=False)
+        .head(top_n)
+    )
+    grouped = grouped.rename(columns={col: "station_name"})
+    return grouped
 
 def trip_duration_summary(df: pd.DataFrame, quantiles=None) -> Dict[str, float]:
     """
@@ -130,5 +163,4 @@ def trip_duration_summary(df: pd.DataFrame, quantiles=None) -> Dict[str, float]:
     for q, value in zip(quantiles, q_values):
         key = f"q{int(q*100)}"
         result[key] = float(value)
-
     return result
