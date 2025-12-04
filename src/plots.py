@@ -140,4 +140,13 @@ def plot_avg_trip_duration_daily(df: pd.DataFrame):
     plt.tight_layout()
     plt.show()
 
+def plot_user_type_comparison(df: pd.DataFrame):
+    summary = user_type_summary(df)
+    fig, ax = plt.subplots(figsize=(8, 4))
+    ax.bar(summary["User Type"], summary["trip_count"])
+    ax.set_xlabel("User Type")
+    ax.set_ylabel("Number of Trips")
+    ax.set_title("Trips by User Type")
+    fig.tight_layout()
+    return fig
 
