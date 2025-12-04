@@ -1,8 +1,9 @@
 from typing import Dict, Literal
-
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
-from .data_cleaning import (
+from data_cleaning import (
     TRIP_DATE_COL,
     START_HOUR_COL,
     TRIP_DURATION_MIN_COL,
@@ -56,9 +57,6 @@ def daily_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
     return grouped
 
 
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 
 def plot_hour_weekday_heatmap(df: pd.DataFrame):
     """
