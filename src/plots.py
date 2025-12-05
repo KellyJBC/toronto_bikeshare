@@ -4,11 +4,20 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 
-from .data_cleaning import (
+from data_cleaning import (
     TRIP_DATE_COL,
     START_HOUR_COL,
     TRIP_DURATION_MIN_COL,
 )
+
+from analytics import (
+    hourly_trip_counts,
+    daily_trip_counts,
+    weekly_trip_counts,
+    popular_stations,
+    user_type_summary,
+)
+
 
 # We use the raw column name here so we don't depend on other modules for this constant
 START_TIME_COL = "Start Time"
@@ -57,10 +66,6 @@ def daily_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
     )
     return grouped
 
-
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 
 def plot_hour_weekday_heatmap(df: pd.DataFrame):
     """
@@ -152,7 +157,6 @@ def plot_user_type_comparison(df: pd.DataFrame):
     fig.tight_layout()
     return fig
 
-from .data_loading import load_station_coordinates
 
 def plot_hourly_usage(df: pd.DataFrame):
     hourly_df = hourly_trip_counts(df)
