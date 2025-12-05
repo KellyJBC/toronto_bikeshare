@@ -152,3 +152,39 @@ def user_type_summary(df: pd.DataFrame) -> pd.DataFrame:
         .sort_values("trip_count", ascending=False)
     )
     return grouped
+
+def trip_duration_summary(df: pd.DataFrame, quantiles=None) -> Dict[str, float]:
+    """
+    Summary statistics for trip duration (in minutes).
+
+    Returns a dictionary with keys:
+    - mean, median, min, max, and selected percentiles.
+
+    Parameters
+    ----------
+    quantiles : list[float] or None
+        Percentiles to compute, e.g. [0.25, 0.75].
+    """
+    if quantiles is None:
+        quantiles = [0.25, 0.5, 0.75]
+
+    if TRIP_DURATION_MIN_COL not in df.columns:
+        raise ValueError(f"{TRIP_DURATION_MIN_COL} not found. Did you run parse_and_enrich_datetime()?")
+
+    series = df[TRIP_DURATION_MIN_COL].dropna()
+    if series.empty:
+        return {}
+
+    result: Dict[str, float] = {
+        "mean": float(series.mean()),
+        "median": float(series.median()),
+        "min": float(series.min()),
+        "max": float(series.max()),
+    }
+
+    q_values = series.quantile(quantiles)
+    for q, value in zip(quantiles, q_values):
+        key = f"q{int(q*100)}"
+        result[key] = float(value)
+
+    return result
