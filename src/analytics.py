@@ -3,14 +3,41 @@ from typing import Dict, Literal
 
 import pandas as pd
 
-from .data_cleaning import (
-    TRIP_DATE_COL,
-    START_HOUR_COL,
-    START_WEEKDAY_COL,
-    START_MONTH_COL,
-    TRIP_DURATION_MIN_COL,
-    full_clean_pipeline,
-)
+try:
+    # Intento 1: Cuando analytics.py se importa como parte del paquete src
+    from .data_cleaning import (
+        TRIP_DATE_COL,
+        START_HOUR_COL,
+    )
+    from .data_loading import START_TIME_COL
+except ImportError:
+    # Intento 2: Cuando analytics.py se ejecuta directamente
+    try:
+        from data_cleaning import (
+            TRIP_DATE_COL,
+            START_HOUR_COL,
+            TRIP_DURATION_MIN_COL,
+            START_WEEKDAY_COL,
+            START_MONTH_COL
+        )
+        from data_loading import START_TIME_COL
+    except ImportError:
+        # Intento 3: Cuando se ejecuta desde otro directorio
+        import sys
+        import os
+        
+        # Agregar el directorio actual al path
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        sys.path.insert(0, current_dir)
+        
+        from data_cleaning import (
+            TRIP_DATE_COL,
+            START_HOUR_COL,
+            TRIP_DURATION_MIN_COL,
+            START_WEEKDAY_COL,
+            START_MONTH_COL
+        )
+        from data_loading import START_TIME_COL
 
 def hourly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
     """

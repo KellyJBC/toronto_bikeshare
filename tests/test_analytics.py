@@ -1,13 +1,16 @@
 import pandas as pd
+import sys
+import os
 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.analytics import (
     hourly_trip_counts,
     daily_trip_counts,
     weekly_trip_counts,
-    popular_stations,
+    START_TIME_COL,
+    TRIP_DATE_COL,
+    START_HOUR_COL,
 )
-from src.data_cleaning import TRIP_DATE_COL, START_HOUR_COL
-from src.data_loading import START_TIME_COL
 
 
 def sample_enriched_df():
@@ -61,3 +64,10 @@ def test_weekly_trip_counts():
     assert weekly["trip_count"].sum() == len(df)
     assert len(weekly) == 1  # all within same week
 
+def test_popular_stations_start():
+    df = sample_enriched_df()
+    top_start = popular_stations(df, top_n=1, by="start")
+    assert len(top_start) == 1
+    assert top_start.iloc[0]["station_name"] in {"A", "B"}
+    # We know each appears 2 times, so counts sum to 2
+    assert top_start.iloc[0]["trip_count"] == 2
