@@ -7,19 +7,27 @@ Light integration smoke test:
 - Compute a couple of summaries
 """
 
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.data_loading import load_raw_data
 from src.data_cleaning import full_clean_pipeline
 from src.analytics import hourly_trip_counts, daily_trip_counts
 
+df_raw = load_raw_data()
+df_clean = full_clean_pipeline(df_raw)
+hourly = hourly_trip_counts(df_clean)
+daily = daily_trip_counts(df_clean)
 
-def test_end_to_end_pipeline_runs():
-    df_raw = load_raw_data()
-    df_clean = full_clean_pipeline(df_raw)
-    hourly = hourly_trip_counts(df_clean)
-    daily = daily_trip_counts(df_clean)
+assert not df_clean.empty
+assert not hourly.empty
+assert not daily.empty
 
-    assert not df_clean.empty
-    assert not hourly.empty
-    assert not daily.empty
+print(df_clean.head)
+print(hourly.head)
+print(daily.head)
+
+print("End-to-end test passed.")
 
 
