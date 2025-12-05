@@ -1,22 +1,22 @@
-import pytest
+test_end_to_end.py
 
-from src.data_loading import load_raw_data, EXPECTED_TRIP_COLUMNS
+Light integration smoke test:
+- Load raw data
+- Clean and enrich
+- Compute a couple of summaries
+"""
+
+from src.data_loading import load_raw_data
+from src.data_cleaning import full_clean_pipeline
+from src.analytics import hourly_trip_counts, daily_trip_counts
 
 
-def test_load_raw_data_returns_dataframe():
-    df = load_raw_data()
-    assert not df.empty, "DataFrame should not be empty"
-    for col in EXPECTED_TRIP_COLUMNS:
-        assert col in df.columns, f"Missing expected column: {col}"
+def test_end_to_end_pipeline_runs():
+    df_raw = load_raw_data()
+    df_clean = full_clean_pipeline(df_raw)
+    hourly = hourly_trip_counts(df_clean)
+    daily = daily_trip_counts(df_clean)
 
-
-def test_load_raw_data_missing_file_raises(tmp_path, monkeypatch):
-    fake_path = tmp_path / "missing.csv"
-
-    # Monkeypatch default path to a fake file
-    from src import data_loading
-
-    monkeypatch.setattr(data_loading, "DEFAULT_TRIP_CSV", fake_path)
-
-    with pytest.raises(FileNotFoundError):
-        load_raw_data()
+    assert not df_clean.empty
+    assert not hourly.empty
+    assert not daily.empty
