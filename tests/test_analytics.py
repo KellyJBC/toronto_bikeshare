@@ -1,16 +1,13 @@
 import pandas as pd
-import sys
-import os
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.analytics import (
     hourly_trip_counts,
     daily_trip_counts,
     weekly_trip_counts,
-    START_TIME_COL,
-    TRIP_DATE_COL,
-    START_HOUR_COL,
+    popular_stations,
 )
+from src.data_cleaning import TRIP_DATE_COL, START_HOUR_COL
+from src.data_loading import START_TIME_COL
 
 
 def sample_enriched_df():
