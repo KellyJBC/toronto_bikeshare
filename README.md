@@ -18,6 +18,8 @@ This project delivers an end-to-end analytics solution for the Toronto Bike-Shar
 ---
 
 ## Project Structure
+
+```text
 toronto_bikeshare/
 ├─ data/
 │  ├─ financial_transactions_toronto_bike.csv   # The provided dataset (put it here)
@@ -28,13 +30,11 @@ toronto_bikeshare/
 │  ├─ data_cleaning.py
 │  ├─ analytics.py
 │  ├─ plots.py
-│  └─ dashboard_app.py                          # Streamlit app
+│  └─ dashboard_app.py                       
 ├─ tests/
-│  ├─ __init__.py
 │  ├─ test_data_loading.py
-│  ├─ test_data_cleaning.py
 │  ├─ test_analytics.py
-│  └─ test_end_to_end.py                        # light integration smoke test
+│  └─ test_end_to_end.py              
 ├─ notebooks/
 │  └─ EDA_and_Demo.ipynb                        # created in Jupyter/Colab, not versioned here
 ├─ .gitignore
