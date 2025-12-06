@@ -1,6 +1,11 @@
 
 from typing import Dict, Literal
 
+# -----------------------------------------------------------------------
+# Import handling:
+# The following block allows analytics.py to be imported or executed
+# -----------------------------------------------------------------------
+
 import pandas as pd
 
 try:
@@ -39,14 +44,24 @@ except ImportError:
         )
         from data_loading import START_TIME_COL
 
+# =======================================================================
+#                               ANALYTICS
+# =======================================================================
+
+
+
 def hourly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Group by start_hour and count trips.
+    Compute the total number of trips occurring in each hour of the day.
 
-    Returns a DataFrame with columns:
-    - start_hour (int)
-    - trip_count (int)
+    Returns:
+            - START_HOUR_COL (int): Hour of day
+            - trip_count (int): Number of trips recorded in that hour
+
+    Raises:
+        ValueError: If START_HOUR_COL is missing from the dataframe.
     """
+    
     if START_HOUR_COL not in df.columns:
         raise ValueError(f"{START_HOUR_COL} not found. Did you run parse_and_enrich_datetime()?")
 
@@ -58,14 +73,19 @@ def hourly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
     )
     return grouped
 
+    
 def daily_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Group by trip_date and count trips.
+    Compute the total number of trips per calendar day.
 
-    Returns columns:
-    - trip_date
-    - trip_count
+    Returns:
+            - TRIP_DATE_COL (datetime.date)
+            - trip_count (int)
+
+    Raises:
+        ValueError: If TRIP_DATE_COL is missing.
     """
+    
     if TRIP_DATE_COL not in df.columns:
         raise ValueError(f"{TRIP_DATE_COL} not found. Did you run parse_and_enrich_datetime()?")
 
@@ -79,9 +99,19 @@ def daily_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def weekly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
+ """
+    Compute the number of trips grouped by ISO week number.
+    Week labels follow the ISO format YYYY-Www.
+
+    Returns:
+            - week_label (str): ISO week label (example: 2024-W31)
+            - trip_count (int)
+
+    Raises:
+        ValueError: If TRIP_DATE_COL is missing.
     """
-    Group trips by ISO week number using TRIP_DATE_COL.
-    """
+
+    
     if TRIP_DATE_COL not in df.columns:
         raise ValueError(f"{TRIP_DATE_COL} not found. Did you run parse_and_enrich_datetime()?")
 
@@ -96,23 +126,30 @@ def weekly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
     )
     return grouped
 
+
 def popular_stations(
     df: pd.DataFrame,
     top_n: int = 10,
     by: Literal["start", "end"] = "start",
 ) -> pd.DataFrame:
-    """
-    Compute top N popular stations.
+    
+ """
+    Compute the top N most frequently used stations.
 
-    Parameters
-    ----------
-    by : "start" or "end"
-        Whether to use Start Station Name or End Station Name.
+    Args:
+        df (pd.DataFrame): Dataframe containing station name columns.
+        top_n (int): Number of top stations to return.
+        by (Literal["start", "end"]): Whether to use the start or end
+            station column.
 
-    Returns columns:
-    - station_name
-    - trip_count
+    Returns:
+            - station_name (str)
+            - trip_count (int)
+
+    Raises:
+        ValueError: If the `by` argument is not "start" or "end".
     """
+
     if by == "start":
         col = "Start Station Name"
     elif by == "end":
@@ -130,15 +167,20 @@ def popular_stations(
     grouped = grouped.rename(columns={col: "station_name"})
     return grouped
 
+
 def user_type_summary(df: pd.DataFrame) -> pd.DataFrame:
     """
     Summarize trips by user type.
 
     Returns columns:
-    - User Type
-    - trip_count
-    - avg_duration_min
+                    - User Type
+                    - trip_count
+                    - avg_duration_min
+
+    Raises:
+        ValueError: If TRIP_DURATION_MIN_COL is missing.
     """
+    
     if TRIP_DURATION_MIN_COL not in df.columns:
         raise ValueError(f"{TRIP_DURATION_MIN_COL} not found. Did you run parse_and_enrich_datetime()?")
 
@@ -152,6 +194,7 @@ def user_type_summary(df: pd.DataFrame) -> pd.DataFrame:
         .sort_values("trip_count", ascending=False)
     )
     return grouped
+    
 
 def trip_duration_summary(df: pd.DataFrame, quantiles=None) -> Dict[str, float]:
     """
@@ -163,8 +206,9 @@ def trip_duration_summary(df: pd.DataFrame, quantiles=None) -> Dict[str, float]:
     Parameters
     ----------
     quantiles : list[float] or None
-        Percentiles to compute, e.g. [0.25, 0.75].
+                Percentiles to compute, example: [0.25, 0.75].
     """
+    
     if quantiles is None:
         quantiles = [0.25, 0.5, 0.75]
 
