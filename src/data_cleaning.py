@@ -1,16 +1,9 @@
-"""
-data_cleaning.py
-
-User Stories:
-- US-02: Clean and validate basic fields (TDD)
-- US-03: Parse datetime and derive time features (TDD)
-"""
-
 from typing import Tuple
 
 import numpy as np
 import pandas as pd
 
+# Raw dataset column names
 TRIP_DURATION_COL = "Trip  Duration"
 START_TIME_COL = "Start Time"
 END_TIME_COL = "End Time"
@@ -27,18 +20,18 @@ TRIP_DURATION_MIN_COL = "trip_duration_min"
 def clean_basic(df: pd.DataFrame) -> pd.DataFrame:
     """
     Basic cleaning:
-    - Drop rows with missing Start Time, End Time, or User Type.
-    - Ensure trip duration is non-negative (drop negative durations).
+    - Dropping rows with missing Start Time, End Time, or User Type.
+    - Removing rows where trip duration (in seconds) is negative.
+    - Resetting the index to maintain a clean, consecutive row order.
 
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        Raw DataFrame loaded from CSV.
+    Returns:
+        pd.DataFrame: A cleaned DataFrame with only valid rows remaining.
 
-    Returns
-    -------
-    cleaned_df : pandas.DataFrame
+    Notes:
+        To avoid unexpected changes in the original dataset, the function creates a copy and performs all cleaning steps on that copy.
+        
     """
+    
     df = df.copy()
 
     # Drop rows with missing key columns
@@ -48,28 +41,29 @@ def clean_basic(df: pd.DataFrame) -> pd.DataFrame:
     if TRIP_DURATION_COL in df.columns:
         df = df[df[TRIP_DURATION_COL] >= 0]
 
-    # Optionally reset index
+    # Reset index for consistency after dropping rows
     df = df.reset_index(drop=True)
     return df
 
 def parse_and_enrich_datetime(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Parse Start Time and End Time as datetime and derive useful features:
-    - trip_date
-    - start_hour
-    - start_weekday
-    - start_month
-    - trip_duration_min (from seconds)
+    Convert timestamps into real datetime values and create useful time features for analysis:
+    
+    - trip_date        → date of trip (year-month-day)
+    - start_hour       → hour of day (0–23)
+    - start_weekday    → weekday name (Monday, Tuesday, ...)
+    - start_month      → month name (January, August, ...)
+    - trip_duration_min → trip duration converted from seconds to minutes
 
     Parameters
     ----------
     df : pandas.DataFrame
-        Cleaned DataFrame.
+         Cleaned DataFrame.
 
-    Returns
-    -------
-    df_features : pandas.DataFrame
+    Returns:
+    A DataFrame containing parsed datetime fields and newly derived features
     """
+    
     df = df.copy()
 
     # Parse datetimes (format: MM/DD/YYYY HH:MM)
