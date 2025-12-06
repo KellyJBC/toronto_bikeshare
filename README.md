@@ -40,6 +40,7 @@ toronto_bikeshare/
 ├─ .gitignore
 ├─ requirements.txt
 └─ README.md
+```
 
 ## Run in Google Colab
 
