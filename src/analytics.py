@@ -51,16 +51,6 @@ except ImportError:
 
 
 def hourly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Compute the total number of trips occurring in each hour of the day.
-
-    Returns:
-            - START_HOUR_COL (int): Hour of day
-            - trip_count (int): Number of trips recorded in that hour
-
-    Raises:
-        ValueError: If START_HOUR_COL is missing from the dataframe.
-    """
     
     if START_HOUR_COL not in df.columns:
         raise ValueError(f"{START_HOUR_COL} not found. Did you run parse_and_enrich_datetime()?")
@@ -75,16 +65,6 @@ def hourly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
 
     
 def daily_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Compute the total number of trips per calendar day.
-
-    Returns:
-            - TRIP_DATE_COL (datetime.date)
-            - trip_count (int)
-
-    Raises:
-        ValueError: If TRIP_DATE_COL is missing.
-    """
     
     if TRIP_DATE_COL not in df.columns:
         raise ValueError(f"{TRIP_DATE_COL} not found. Did you run parse_and_enrich_datetime()?")
@@ -99,13 +79,6 @@ def daily_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def weekly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Group trips by ISO week number of Start Time.
-
-    Returns columns:
-    - week_label (e.g., '2024-W31')
-    - trip_count
-    """
     if START_TIME_COL not in df.columns:
         raise ValueError(f"{START_TIME_COL} not found.")
 
@@ -120,24 +93,27 @@ def weekly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
     )
     return grouped
 
+def monthly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
+    if START_TIME_COL not in df.columns:
+        raise ValueError(f"{START_TIME_COL} not found.")
+
+    temp = df.copy()
+    temp["year_month"] = temp[START_TIME_COL].dt.strftime("%Y-%m")
+
+    grouped = (
+        temp.groupby("year_month")
+        .size()
+        .reset_index(name="trip_count")
+        .sort_values("year_month")
+    )
+    return grouped
+
 
 def popular_stations(
     df: pd.DataFrame,
     top_n: int = 10,
     by: Literal["start", "end"] = "start",
 ) -> pd.DataFrame:
-    """
-    Compute top N popular stations.
-
-    Parameters
-    ----------
-    by : "start" or "end"
-        Whether to use Start Station Name or End Station Name.
-
-    Returns columns:
-    - station_name
-    - trip_count
-    """
     if by == "start":
         col = "Start Station Name"
     elif by == "end":
