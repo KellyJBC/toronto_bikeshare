@@ -118,3 +118,18 @@ def load_station_coordinates(csv_path: Optional[str] = None) -> Optional[pd.Data
         raise ValueError(f"Station coordinates CSV missing columns: {missing}")
 
     return df
+
+def load_station_coordinates(csv_path: Optional[str] = None) -> Optional[pd.DataFrame]:
+    path = Path(csv_path) if csv_path is not None else DEFAULT_STATION_COORDS_CSV
+    if not path.exists():
+        # This is not considered an error; map is optional.
+        return None
+
+    df = pd.read_csv(path)
+
+    required_cols = {"station_id", "station_name", "lat", "lon"}
+    missing = required_cols.difference(df.columns)
+    if missing:
+        raise ValueError(f"Station coordinates CSV missing columns: {missing}")
+
+    return df

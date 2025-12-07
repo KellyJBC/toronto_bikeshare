@@ -1,4 +1,4 @@
-from typing import Dict, Literal
+from typing import Dict, Literal, Optional
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -18,6 +18,7 @@ from analytics import (
     user_type_summary,
 )
 
+from data_loading import load_station_coordinates
 
 # We use the raw column name here so we don't depend on other modules for this constant
 START_TIME_COL = "Start Time"
@@ -167,4 +168,40 @@ def plot_hourly_usage(df: pd.DataFrame):
     ax.set_title("Trips per Hour")
     ax.set_xticks(range(0, 24))
     fig.tight_layout()
+    return fig
+
+def build_station_map_figure(df: pd.DataFrame) -> Optional["px.scatter_mapbox"]:
+    """
+    Build a Plotly scatter_mapbox figure showing station usage, if coordinates exist.
+
+    If station_coordinates CSV is not available, returns None.
+    """
+    coords = load_station_coordinates()
+    if coords is None:
+        return None
+
+    # Use start station id for usage counts
+    start_usage = (
+        df.groupby("Start Station Id")
+        .size()
+        .reset_index(name="trip_count")
+        .rename(columns={"Start Station Id": "station_id"})
+    )
+
+    merged = start_usage.merge(coords, on="station_id", how="left")
+    merged = merged.dropna(subset=["lat", "lon"])
+
+    fig = px.scatter_mapbox(
+        merged,
+        lat="lat",
+        lon="lon",
+        size="trip_count",
+        color="trip_count",
+        hover_name="station_name",
+        zoom=11,
+        height=500,
+        title="Station Usage Map (Start Stations)",
+    )
+    fig.update_layout(mapbox_style="open-street-map")
+    fig.update_layout(margin={"r": 0, "t": 50, "l": 0, "b": 0})
     return fig

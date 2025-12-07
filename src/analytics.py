@@ -99,24 +99,18 @@ def daily_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def weekly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
- """
-    Compute the number of trips grouped by ISO week number.
-    Week labels follow the ISO format YYYY-Www.
-
-    Returns:
-            - week_label (str): ISO week label (example: 2024-W31)
-            - trip_count (int)
-
-    Raises:
-        ValueError: If TRIP_DATE_COL is missing.
     """
+    Group trips by ISO week number of Start Time.
 
-    
-    if TRIP_DATE_COL not in df.columns:
-        raise ValueError(f"{TRIP_DATE_COL} not found. Did you run parse_and_enrich_datetime()?")
+    Returns columns:
+    - week_label (e.g., '2024-W31')
+    - trip_count
+    """
+    if START_TIME_COL not in df.columns:
+        raise ValueError(f"{START_TIME_COL} not found.")
 
     temp = df.copy()
-    temp["week_label"] = temp[TRIP_DATE_COL].dt.strftime("%G-W%V")
+    temp["week_label"] = temp[START_TIME_COL].dt.strftime("%G-W%V")
 
     grouped = (
         temp.groupby("week_label")
@@ -132,24 +126,18 @@ def popular_stations(
     top_n: int = 10,
     by: Literal["start", "end"] = "start",
 ) -> pd.DataFrame:
-    
- """
-    Compute the top N most frequently used stations.
-
-    Args:
-        df (pd.DataFrame): Dataframe containing station name columns.
-        top_n (int): Number of top stations to return.
-        by (Literal["start", "end"]): Whether to use the start or end
-            station column.
-
-    Returns:
-            - station_name (str)
-            - trip_count (int)
-
-    Raises:
-        ValueError: If the `by` argument is not "start" or "end".
     """
+    Compute top N popular stations.
 
+    Parameters
+    ----------
+    by : "start" or "end"
+        Whether to use Start Station Name or End Station Name.
+
+    Returns columns:
+    - station_name
+    - trip_count
+    """
     if by == "start":
         col = "Start Station Name"
     elif by == "end":
@@ -209,6 +197,42 @@ def trip_duration_summary(df: pd.DataFrame, quantiles=None) -> Dict[str, float]:
                 Percentiles to compute, example: [0.25, 0.75].
     """
     
+    if quantiles is None:
+        quantiles = [0.25, 0.5, 0.75]
+
+    if TRIP_DURATION_MIN_COL not in df.columns:
+        raise ValueError(f"{TRIP_DURATION_MIN_COL} not found. Did you run parse_and_enrich_datetime()?")
+
+    series = df[TRIP_DURATION_MIN_COL].dropna()
+    if series.empty:
+        return {}
+
+    result: Dict[str, float] = {
+        "mean": float(series.mean()),
+        "median": float(series.median()),
+        "min": float(series.min()),
+        "max": float(series.max()),
+    }
+
+    q_values = series.quantile(quantiles)
+    for q, value in zip(quantiles, q_values):
+        key = f"q{int(q*100)}"
+        result[key] = float(value)
+
+    return result
+
+def trip_duration_summary(df: pd.DataFrame, quantiles=None) -> Dict[str, float]:
+    """
+    Summary statistics for trip duration (in minutes).
+
+    Returns a dictionary with keys:
+    - mean, median, min, max, and selected percentiles.
+
+    Parameters
+    ----------
+    quantiles : list[float] or None
+        Percentiles to compute, e.g. [0.25, 0.75].
+    """
     if quantiles is None:
         quantiles = [0.25, 0.5, 0.75]
 
