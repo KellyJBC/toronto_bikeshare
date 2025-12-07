@@ -171,11 +171,6 @@ def plot_hourly_usage(df: pd.DataFrame):
     return fig
 
 def build_station_map_figure(df: pd.DataFrame) -> Optional["px.scatter_mapbox"]:
-    """
-    Build a Plotly scatter_mapbox figure showing station usage, if coordinates exist.
-
-    If station_coordinates CSV is not available, returns None.
-    """
     coords = load_station_coordinates()
     if coords is None:
         return None
