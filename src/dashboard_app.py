@@ -1,16 +1,16 @@
 import streamlit as st
 import pandas as pd
 
-from .data_loading import load_raw_data
-from .data_cleaning import full_clean_pipeline, TRIP_DATE_COL
-from .analytics import (
+from data_loading import load_raw_data
+from data_cleaning import full_clean_pipeline, TRIP_DATE_COL
+from analytics import (
     hourly_trip_counts,
     daily_trip_counts,
     weekly_trip_counts,
     user_type_summary,
     trip_duration_summary,
 )
-from .plots import (
+from plots import (
     plot_hourly_usage,
     plot_daily_trends,
     plot_weekly_trends,

@@ -16,6 +16,7 @@ from analytics import (
     weekly_trip_counts,
     popular_stations,
     user_type_summary,
+    monthly_trip_counts,
 )
 
 from data_loading import load_station_coordinates
@@ -25,13 +26,6 @@ START_TIME_COL = "Start Time"
 
 
 def hourly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Group by start_hour and count trips.
-
-    Returns a DataFrame with columns:
-    - start_hour (int)
-    - trip_count (int)
-    """
     if START_HOUR_COL not in df.columns:
         raise ValueError(
             f"{START_HOUR_COL} not found. Did you run parse_and_enrich_datetime()?"
@@ -47,13 +41,6 @@ def hourly_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def daily_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Group by trip_date and count trips.
-
-    Returns columns:
-    - trip_date
-    - trip_count
-    """
     if TRIP_DATE_COL not in df.columns:
         raise ValueError(
             f"{TRIP_DATE_COL} not found. Did you run parse_and_enrich_datetime()?"
@@ -67,15 +54,42 @@ def daily_trip_counts(df: pd.DataFrame) -> pd.DataFrame:
     )
     return grouped
 
+def plot_daily_trends(df: pd.DataFrame):
+    daily_df = daily_trip_counts(df)
+    fig, ax = plt.subplots(figsize=(8, 4))
+    ax.plot(daily_df["trip_date"], daily_df["trip_count"], marker="o")
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Number of Trips")
+    ax.set_title("Daily Ridership")
+    fig.autofmt_xdate()
+    fig.tight_layout()
+    return fig
+
+def plot_weekly_trends(df: pd.DataFrame):
+    weekly_df = weekly_trip_counts(df)
+    fig, ax = plt.subplots(figsize=(8, 4))
+    ax.plot(weekly_df["week_label"], weekly_df["trip_count"], marker="o")
+    ax.set_xlabel("ISO Week")
+    ax.set_ylabel("Number of Trips")
+    ax.set_title("Weekly Ridership")
+    plt.xticks(rotation=45)
+    fig.tight_layout()
+    return fig
+
+def plot_popular_stations(df: pd.DataFrame, top_n: int = 10, by: str = "start"):
+    stations_df = popular_stations(df, top_n=top_n, by=by)
+    fig, ax = plt.subplots(figsize=(8, 4))
+    ax.barh(stations_df["station_name"], stations_df["trip_count"])
+    ax.set_xlabel("Number of Trips")
+    ax.set_ylabel("Station")
+    title_prefix = "Start" if by == "start" else "End"
+    ax.set_title(f"Top {top_n} {title_prefix} Stations")
+    ax.invert_yaxis()
+    fig.tight_layout()
+    return fig
+
 
 def plot_hour_weekday_heatmap(df: pd.DataFrame):
-    """
-    Heatmap Hour vs Weekday
-    Required Data:
-    - start_hour
-    - start_weekday
-    """
-
     # Days Order
     weekday_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
@@ -102,16 +116,31 @@ def plot_hour_weekday_heatmap(df: pd.DataFrame):
     plt.tight_layout()
     plt.show()
     
+def plot_duration_histogram(df: pd.DataFrame):
+    if "trip_duration_min" not in df.columns:
+        raise ValueError("trip_duration_min not found; run parse_and_enrich_datetime().")
+
+    fig, ax = plt.subplots(figsize=(8, 4))
+    ax.hist(df["trip_duration_min"], bins=50)
+    ax.set_xlabel("Trip Duration (minutes)")
+    ax.set_ylabel("Frequency")
+    ax.set_title("Trip Duration Distribution")
+    fig.tight_layout()
+    return fig
+
+def plot_monthly_trends(df: pd.DataFrame):
+    monthly_df = monthly_trip_counts(df)
+    fig, ax = plt.subplots(figsize=(8, 4))
+    ax.plot(monthly_df["year_month"], monthly_df["trip_count"], marker="o")
+    ax.set_xlabel("Year-Month")
+    ax.set_ylabel("Number of Trips")
+    ax.set_title("Monthly Ridership")
+    plt.xticks(rotation=45)
+    fig.tight_layout()
+    return fig
+
 
 def plot_trip_duration_hist(df: pd.DataFrame):
-    """
-    Histogram of Trip Duration (minutes)
-    Requires column: trip_duration_min
-    -Shows short vs. long trips
-    -Detects outliers
-    -Displays the shape of the distribution
-    """
-
     if "trip_duration_min" not in df.columns:
         raise ValueError("trip_duration_min not found. Run parse_and_enrich_datetime first.")
 
