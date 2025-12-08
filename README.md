@@ -52,6 +52,9 @@ toronto_bikeshare/
    !pip install -r requirements.txt
 4. Open and run notebooks/eda.ipynb.
 
+# Run Dashboard
+
+streamlit run src/dashboard_app.py
 
 
 
