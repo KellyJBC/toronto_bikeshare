@@ -2,6 +2,9 @@ from typing import Dict, Literal
 
 import pandas as pd
 
+# ----------------------------------------------------------------------
+# Imports that work both as part of the src package and when run directly
+# ----------------------------------------------------------------------
 try:
     # Case 1: analytics.py imported as part of the src package
     from .data_cleaning import (
@@ -40,8 +43,10 @@ except ImportError:
         )
         from data_loading import START_TIME_COL
 
-# Helper functions for US-12 (refactor)
 
+# ----------------------------------------------------------------------
+# Helper functions for US-12 (refactor)
+# ----------------------------------------------------------------------
 def _require_columns(df: pd.DataFrame, cols: list[str]) -> None:
     """Raise ValueError if any required columns are missing."""
     missing = [c for c in cols if c not in df.columns]
