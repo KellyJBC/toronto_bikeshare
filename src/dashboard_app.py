@@ -21,7 +21,6 @@ from plots import (
     build_station_map_figure,
 )
 
-
 @st.cache_data
 def load_and_prepare_data() -> pd.DataFrame:
 
@@ -69,7 +68,7 @@ def main():
     )
     
     # Bike model filter
-    models = sorted(df["Model"].unique())
+    models = sorted(df["Model"].dropna().astype(str).unique())
     selected_models = st.sidebar.multiselect(
         "Bike Model",
         options=models,
