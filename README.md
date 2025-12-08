@@ -22,8 +22,8 @@ This project delivers an end-to-end analytics solution for the Toronto Bike-Shar
 ```text
 toronto_bikeshare/
 ├─ data/
-│  ├─ financial_transactions_toronto_bike.csv   # The provided dataset (put it here)
-│  └─ stations_coordinates.csv                  # OPTIONAL: station_id, name, lat, lon (for map)
+│  ├─ financial_transactions_toronto_bike.csv   
+│  └─ stations_coordinates.csv                  
 ├─ src/
 │  ├─ __init__.py
 │  ├─ data_loading.py
@@ -52,6 +52,9 @@ toronto_bikeshare/
    !pip install -r requirements.txt
 4. Open and run notebooks/eda.ipynb.
 
+# Run Dashboard
+
+streamlit run src/dashboard_app.py
 
 
 
