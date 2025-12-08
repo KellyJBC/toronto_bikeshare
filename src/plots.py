@@ -192,40 +192,31 @@ def plot_hourly_usage(df: pd.DataFrame):
     hourly_df = hourly_trip_counts(df)
     fig, ax = plt.subplots(figsize=(8, 4))
     ax.bar(hourly_df["start_hour"], hourly_df["trip_count"])
-    ax.set_xlabel("Hour of Day")
-    ax.set_ylabel("Number of Trips")
-    ax.set_title("Trips per Hour")
-    ax.set_xticks(range(0, 24))
+    
+    # Resumido: Usamos .set() para configurar todo en una línea
+    ax.set(xlabel="Hour of Day", ylabel="Number of Trips", title="Trips per Hour", xticks=range(24))
+    
     fig.tight_layout()
     return fig
 
 def build_station_map_figure(df: pd.DataFrame) -> Optional["px.scatter_mapbox"]:
     coords = load_station_coordinates()
-    if coords is None:
-        return None
+    if coords is None: return None # Retorno temprano en una línea
 
-    # Use start station id for usage counts
-    start_usage = (
-        df.groupby("Start Station Id")
-        .size()
-        .reset_index(name="trip_count")
-        .rename(columns={"Start Station Id": "station_id"})
-    )
+    # Misma lógica de agrupación, solo formateada más compacta
+    start_usage = (df.groupby("Start Station Id").size()
+                   .reset_index(name="trip_count")
+                   .rename(columns={"Start Station Id": "station_id"}))
 
-    merged = start_usage.merge(coords, on="station_id", how="left")
-    merged = merged.dropna(subset=["lat", "lon"])
+    merged = start_usage.merge(coords, on="station_id", how="left").dropna(subset=["lat", "lon"])
 
     fig = px.scatter_mapbox(
-        merged,
-        lat="lat",
-        lon="lon",
-        size="trip_count",
-        color="trip_count",
-        hover_name="station_name",
-        zoom=11,
-        height=500,
-        title="Station Usage Map (Start Stations)",
+        merged, lat="lat", lon="lon", size="trip_count", color="trip_count",
+        hover_name="station_name", zoom=11, height=500, title="Station Usage Map (Start Stations)"
     )
-    fig.update_layout(mapbox_style="open-street-map")
-    fig.update_layout(margin={"r": 0, "t": 50, "l": 0, "b": 0})
+    
+    # Resumido: Unimos los estilos y márgenes en una sola actualización
+    fig.update_layout(mapbox_style="open-street-map", margin=dict(r=0, t=50, l=0, b=0))
+    
     return fig
+
