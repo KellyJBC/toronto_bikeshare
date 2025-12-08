@@ -121,7 +121,7 @@ def main():
             "Popular Stations",
             "Duration Distribution",
             "User Type Comparison",
-            "Map (Optional)",
+            "Map Visualization",
         ]
     )
     # Tab 1: Hourly Usage
